@@ -8,19 +8,27 @@
 
 import UIKit
 
-class ViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class ViewController: UIViewController {
 
     // MARK: - View
     @IBOutlet var tableView: UITableView!
     @IBOutlet var segmentControl: UISegmentedControl!
+    var dataSources:[UITableViewDataSource] = []
+    let catDataSource = CatDataSource()
+    let smileyDataSOurce = SmileyDataSource()
     
     // MARK: - Model
     let modelController = ModelController()
-    
+
     // MARK: - LifeCycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        tableView.dataSource = self
+        
+        catDataSource.dataList = modelController.kittisList
+        smileyDataSOurce.dataList = modelController.smileyList
+        dataSources = [catDataSource, smileyDataSOurce]
+        
+        tableView.dataSource = dataSources[0]
         tableView.tableFooterView = UIView(frame: CGRect.zero)
     }
     
@@ -30,31 +38,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     
     // MARK: - Actions
     @IBAction func segementSelected(_ sender: UISegmentedControl) {
+        tableView.dataSource = dataSources[sender.selectedSegmentIndex]
         tableView.reloadData()
     }
-    
-    // MARK: - UITableViewDataSource
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if segmentControl.selectedSegmentIndex == 0 {
-            return modelController.kittisList.count
-        }
-        else {
-            return modelController.smileyList.count
-        }
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if segmentControl.selectedSegmentIndex == 0 {
-            let cell = tableView.dequeueReusableCell(withIdentifier: "catCell", for: indexPath)
-            cell.textLabel?.text = modelController.kittisList[indexPath.row]
-            return cell
-        }
-        else {
-            let cell = tableView.dequeueReusableCell(withIdentifier: "smileyCell", for: indexPath)
-            cell.textLabel?.text = modelController.smileyList[indexPath.row]
-            return cell
-        }
-    }
 }
-
